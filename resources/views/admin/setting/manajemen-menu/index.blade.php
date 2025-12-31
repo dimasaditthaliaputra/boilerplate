@@ -120,8 +120,8 @@
                     searchPlaceholder: "Search menus...",
                     lengthMenu: "Show _MENU_",
                     paginate: {
-                        previous: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
-                        next: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>'
+                        previous: 'Previous',
+                        next: 'Next'
                     }
                 }
             });
