@@ -23,7 +23,7 @@
                 <label class="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Permissions <span class="text-error-500">*</span>
                 </label>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto no-scrollbar p-1">
                     @foreach ($permissions as $permission)
                         <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
                             <input type="checkbox" name="permission_name[]" value="{{ $permission->name }}"
@@ -37,7 +37,7 @@
     </form>
 
     <x-slot name="footer">
-        <div class="flex items-center justify-end gap-3">
+        <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <x-ui.button type="button" variant="outline" onclick="closeRoleModal()">
                 Tutup
             </x-ui.button>

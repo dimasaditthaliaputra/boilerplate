@@ -50,9 +50,9 @@
 @push('scripts')
     <script type="module">
         // Expose modal functions to window for onclick handlers
-        window.openMenuModal = function(id = null) {
-            if (id) {
-                $.get('{{ route("manajemen-menu.index") }}/' + id + '/edit', function(response) {
+        window.openMenuModal = function(id = null, url = null) {
+            if (id && url) {
+                $.get(url, function(response) {
                     if (response.success) {
                         $('#menuModalLabel').text('Edit Menu');
                         $('#primary_id').val(response.data.id);
@@ -126,9 +126,9 @@
             });
 
             $(document).on('click', '.edit-button', function() {
+                var id = $(this).data('id');
                 var url = $(this).data('url');
-                var id = url.split('/').slice(-2, -1)[0];
-                window.openMenuModal(id);
+                window.openMenuModal(id, url);
             });
 
             $(document).on('click', '.delete-button', function(e) {

@@ -47,10 +47,10 @@
 @push('scripts')
     <script type="module">
         // Expose modal functions to window for onclick handlers
-        window.openModal = function(id = null) {
-            if (id) {
+        window.openModal = function(id = null, url = null) {
+            if (id && url) {
                 // Edit mode - fetch data first
-                $.get('{{ route("manajemen-hak-akses.index") }}/' + id + '/edit', function(response) {
+                $.get(url, function(response) {
                     if (response.success) {
                         $('#hakAksesModalLabel').text('Edit Permission');
                         $('#primary_id').val(response.data.id);
@@ -273,9 +273,9 @@
 
             // Edit handler
             $(document).on('click', '.edit-button', function() {
+                var id = $(this).data('id');
                 var url = $(this).data('url');
-                var id = url.split('/').slice(-2, -1)[0];
-                window.openModal(id);
+                window.openModal(id, url);
             });
         });
     </script>
