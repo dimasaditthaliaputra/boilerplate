@@ -43,6 +43,7 @@
                 serverSide: true,
                 responsive: true,
                 ordering: false,
+                pagingType: 'simple_numbers',
                 ajax: "{{ route('manajemen-role.index') }}",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'px-5 py-4 text-center text-sm dark:text-gray-300 sm:px-6' },

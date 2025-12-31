@@ -91,6 +91,7 @@
                 responsive: true,
                 ordering: false,
                 pageLength: 10,
+                pagingType: 'simple_numbers',
                 layout: {
                     topStart: 'pageLength',
                     topEnd: 'search',

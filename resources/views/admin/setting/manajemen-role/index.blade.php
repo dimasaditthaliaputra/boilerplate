@@ -87,6 +87,7 @@
                 serverSide: true,
                 responsive: true,
                 ordering: false,
+                pagingType: 'simple_numbers',
                 layout: {
                     topStart: 'pageLength',
                     topEnd: 'search',
