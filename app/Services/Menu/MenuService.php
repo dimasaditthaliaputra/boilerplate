@@ -17,15 +17,17 @@ class MenuService
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('is_active', function ($row) {
-                return $row->is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
+                return $row->is_active 
+                    ? '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-400">Active</span>' 
+                    : '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-400">Inactive</span>';
             })
             ->addColumn('action', function ($row) {
                 $showUrl = route('manajemen-menu.show', $row->id);
                 $deleteUrl = route('manajemen-menu.destroy', $row->id);
 
-                $btn = '<div class="d-flex justify-content-center gap-2">';
-                $btn .= '<button class="btn btn-primary btn-sm edit-button" data-id="' . e($row->id) . '" data-url="' . e($showUrl) . '">Edit</button>';
-                $btn .= '<form action="' . e($deleteUrl) . '" method="POST" style="display:inline;">' . csrf_field() . method_field('DELETE') . '<button type="submit" class="delete-button btn btn-danger btn-sm ml-2">Hapus</button></form>';
+                $btn = '<div class="flex items-center justify-center gap-2">';
+                $btn .= '<button class="inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 transition-colors edit-button" data-id="' . e($row->id) . '" data-url="' . e($showUrl) . '">Edit</button>';
+                $btn .= '<form action="' . e($deleteUrl) . '" method="POST" class="inline">' . csrf_field() . method_field('DELETE') . '<button type="submit" class="delete-button inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium text-white bg-error-500 hover:bg-error-600 transition-colors">Hapus</button></form>';
                 $btn .= '</div>';
                 return $btn;
             })
