@@ -10,26 +10,36 @@
         <div class="space-y-5">
             <!-- Name -->
             <div>
-                <label for="name" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Nama <span class="text-error-500">*</span>
                 </label>
                 <input type="text" id="name" name="name"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                     placeholder="Contoh: Admin, User, Manager">
             </div>
 
             <!-- Permissions -->
             <div>
-                <label class="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Permissions <span class="text-error-500">*</span>
                 </label>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto no-scrollbar p-1">
                     @foreach ($permissions as $permission)
-                        <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <input type="checkbox" name="permission_name[]" value="{{ $permission->name }}"
-                                class="w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $permission->name }}</span>
-                        </label>
+                        <div x-data="{ checked: false }" class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <label class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
+                                <div class="relative">
+                                    <input type="checkbox" name="permission_name[]" value="{{ $permission->name }}" class="sr-only" @change="checked = !checked">
+                                    <div :class="checked ? 'border-brand-500 bg-brand-500' : 'border-gray-300 dark:border-gray-700'" class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
+                                        <span :class="checked ? '' : 'opacity-0'">
+                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                {{ $permission->name }}
+                            </label>
+                        </div>
                     @endforeach
                 </div>
             </div>
