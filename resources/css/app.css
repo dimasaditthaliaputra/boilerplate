@@ -3,7 +3,6 @@ layer(base);
 
 /* Third-party CSS imports */
 @import "sweetalert2/dist/sweetalert2.min.css";
-@import "toastr/build/toastr.min.css";
 
 @import "tailwindcss";
 

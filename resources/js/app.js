@@ -12,17 +12,13 @@ window.DataTable = DataTable;
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
-// Import Toastr and expose globally
-import toastr from 'toastr';
-window.toastr = toastr;
-
-// Configure default Toastr options
-toastr.options = {
-    closeButton: true,
-    progressBar: true,
-    positionClass: 'toast-bottom-right',
-    timeOut: 5000,
+// Global notification function (replaces Toastr)
+window.showNotification = function (type, message) {
+    window.dispatchEvent(new CustomEvent('show-notification', {
+        detail: { type, message }
+    }));
 };
+
 
 // Import Alpine.js
 import Alpine from 'alpinejs';

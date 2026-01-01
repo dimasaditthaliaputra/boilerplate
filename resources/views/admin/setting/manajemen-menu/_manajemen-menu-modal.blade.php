@@ -123,14 +123,14 @@
                 processData: false,
                 success: function(response) {
                     closeMenuModal();
-                    toastr.success(response.message, "SUCCESS", { positionClass: "toast-bottom-right" });
+                    showNotification('success', response.message);
                     $('#table').DataTable().ajax.reload();
                     submitBtn.prop('disabled', false).html('Simpan Menu');
                 },
                 error: function(response) {
                     submitBtn.prop('disabled', false).html('Simpan Menu');
                     if (response.status === 422) {
-                        toastr.error("There are errors in your input!", "ERROR", { positionClass: "toast-bottom-right" });
+                        showNotification('error', 'There are errors in your input!');
                         let errors = response.responseJSON.errors;
                         $.each(errors, function(key, val) {
                             let input = $('#' + key);
@@ -139,7 +139,7 @@
                             input.parent().append('<span class="text-error-500 text-sm mt-1">' + val[0] + '</span>');
                         });
                     } else {
-                        toastr.error("An error occurred", "ERROR", { positionClass: "toast-bottom-right" });
+                        showNotification('error', 'An error occurred');
                     }
                 }
             });

@@ -126,6 +126,9 @@
         </div>
     </div>
 
+    {{-- Global Notification Component --}}
+    <x-ui.notification />
+
     @stack('scripts')
 
 </body>

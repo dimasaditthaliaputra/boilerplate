@@ -169,11 +169,7 @@
 
                 let accessChecked = $('input[name="access[]"]:checked').length;
                 if (accessChecked === 0) {
-                    toastr.error("Pilih minimal satu akses!", "ERROR", {
-                        progressBar: true,
-                        timeOut: 3500,
-                        positionClass: "toast-bottom-right",
-                    });
+                    showNotification('error', 'Pilih minimal satu akses!');
                     return;
                 }
 
@@ -196,21 +192,13 @@
                     processData: false,
                     success: function(response) {
                         window.closeModal();
-                        toastr.success(response.message, "SUCCESS", {
-                            progressBar: true,
-                            timeOut: 3500,
-                            positionClass: "toast-bottom-right",
-                        });
+                        showNotification('success', response.message);
                         table.ajax.reload();
                     },
                     error: function(response) {
                         submitBtn.prop('disabled', false).html('Simpan Permission');
                         if (response.status === 422) {
-                            toastr.error("There are errors in your input!", "ERROR", {
-                                progressBar: true,
-                                timeOut: 3500,
-                                positionClass: "toast-bottom-right",
-                            });
+                            showNotification('error', 'There are errors in your input!');
                             let errors = response.responseJSON.errors;
                             $.each(errors, function(key, val) {
                                 let input = $('#' + key);
@@ -219,11 +207,7 @@
                                 input.parent().append('<span class="text-error-500 text-sm mt-1">' + val[0] + '</span>');
                             });
                         } else {
-                            toastr.error("An error occurred", "ERROR", {
-                                progressBar: true,
-                                timeOut: 3500,
-                                positionClass: "toast-bottom-right",
-                            });
+                            showNotification('error', 'An error occurred');
                         }
                     }
                 });
@@ -253,19 +237,11 @@
                             method: 'POST',
                             data: form.serialize(),
                             success: function(response) {
-                                toastr.success(response.message, "SUCCESS", {
-                                    progressBar: true,
-                                    timeOut: 3500,
-                                    positionClass: "toast-bottom-right"
-                                });
+                                showNotification('success', response.message);
                                 table.ajax.reload(null, false);
                             },
                             error: function() {
-                                toastr.error("Failed to delete", "ERROR", {
-                                    progressBar: true,
-                                    timeOut: 3500,
-                                    positionClass: "toast-bottom-right"
-                                });
+                                showNotification('error', 'Failed to delete');
                             }
                         });
                     }

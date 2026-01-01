@@ -154,11 +154,11 @@
                             method: 'POST',
                             data: form.serialize(),
                             success: function(response) {
-                                toastr.success(response.message, "SUCCESS", { positionClass: "toast-bottom-right" });
+                                showNotification('success', response.message);
                                 table.ajax.reload(null, false);
                             },
                             error: function() {
-                                toastr.error("Failed to delete", "ERROR", { positionClass: "toast-bottom-right" });
+                                showNotification('error', 'Failed to delete');
                             }
                         });
                     }
