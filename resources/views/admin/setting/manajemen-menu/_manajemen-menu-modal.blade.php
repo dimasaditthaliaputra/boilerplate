@@ -119,6 +119,33 @@
 
 @push('scripts')
     <script type="module">
+        // Reset form completely
+        function resetMenuForm() {
+            const form = document.getElementById('menuForm');
+            if (!form) return;
+            
+            // Reset form values
+            form.reset();
+            document.getElementById('primary_id').value = '';
+            document.getElementById('menuModalLabel').textContent = 'Tambah Menu';
+            
+            // Clear validation errors
+            clearFormErrors('menuForm');
+            
+            // Reset Alpine.js select states
+            document.querySelectorAll('#menuForm [x-data]').forEach(el => {
+                if (el.__x) {
+                    el.__x.$data.isOptionSelected = false;
+                } else if (el._x_dataStack) {
+                    el._x_dataStack[0].isOptionSelected = false;
+                }
+            });
+        }
+
+        // Listen for modal close event
+        window.addEventListener('modal-closed-menumodal', resetMenuForm);
+
+        // Form submission
         document.getElementById('menuForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -169,13 +196,7 @@
                     Object.keys(error.errors).forEach(key => {
                         const input = document.getElementById(key);
                         if (input) {
-                            input.classList.add('border-error-500');
-                            const existingError = input.parentElement.querySelector('.text-error-500:not(label span)');
-                            if (existingError) existingError.remove();
-                            const errorSpan = document.createElement('span');
-                            errorSpan.className = 'text-error-500 text-sm mt-1';
-                            errorSpan.textContent = error.errors[key][0];
-                            input.parentElement.appendChild(errorSpan);
+                            setInputError(input, error.errors[key][0]);
                         }
                     });
                 } else {

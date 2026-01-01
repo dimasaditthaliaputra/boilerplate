@@ -143,13 +143,7 @@
                         Object.keys(error.errors).forEach(key => {
                             const input = document.getElementById(key);
                             if (input) {
-                                input.classList.add('border-error-500');
-                                const existingError = input.parentElement.querySelector('.text-error-500:not(label span)');
-                                if (existingError) existingError.remove();
-                                const errorSpan = document.createElement('span');
-                                errorSpan.className = 'text-error-500 text-sm mt-1';
-                                errorSpan.textContent = error.errors[key][0];
-                                input.parentElement.appendChild(errorSpan);
+                                setInputError(input, error.errors[key][0]);
                             }
                         });
                     } else {
@@ -223,24 +217,24 @@
                         document.getElementById('hakAksesModalLabel').textContent = 'Edit Permission';
                         document.getElementById('primary_id').value = response.data.id;
                         document.getElementById('name').value = response.data.name;
-                        document.getElementById('menu').value = response.data.menu;
+                        
+                        // Set menu select value and sync Alpine state
+                        const menuSelect = document.getElementById('menu');
+                        menuSelect.value = response.data.menu;
+                        syncAlpineSelect(menuSelect, !!response.data.menu);
 
-                        // Parse permissions and check boxes
-                        if (response.data.permissions) {
-                            const actions = ['show', 'create', 'update', 'delete', 'export', 'import', 'approve', 'report'];
-                            actions.forEach(action => {
+                        // Reset all checkboxes first
+                        document.querySelectorAll('input[name="access[]"]').forEach(cb => {
+                            syncAlpineCheckbox(cb, false);
+                        });
+
+                        // Set checked state for actions from response
+                        // API returns actions as array like ['show', 'create', 'update']
+                        if (response.data.actions && response.data.actions.length > 0) {
+                            response.data.actions.forEach(action => {
                                 const checkbox = document.querySelector(`input[name="access[]"][value="${action}"]`);
                                 if (checkbox) {
-                                    checkbox.checked = response.data.permissions.some(p => p.includes(`.${action}`));
-                                }
-                            });
-                        } else {
-                            // Parse from single permission name
-                            const permissionTypes = ['show', 'create', 'update', 'delete', 'export', 'import', 'approve', 'report'];
-                            permissionTypes.forEach(type => {
-                                if (response.data.name.includes(`.${type}`)) {
-                                    const checkbox = document.querySelector(`input[name="access[]"][value="${type}"]`);
-                                    if (checkbox) checkbox.checked = true;
+                                    syncAlpineCheckbox(checkbox, true);
                                 }
                             });
                         }
@@ -257,15 +251,44 @@
 
         window.closeModal = function() {
             window.dispatchEvent(new CustomEvent('close-modal-hakaksesmodal'));
-            resetForm();
         };
 
+        // Listen for modal close event
+        window.addEventListener('modal-closed-hakaksesmodal', resetForm);
+
         function resetForm() {
+            const form = document.getElementById('formData');
+            if (!form) return;
+            
+            // Reset form values  
+            form.reset();
             document.getElementById('primary_id').value = '';
+            document.getElementById('hakAksesModalLabel').textContent = 'Tambah Permission';
+            
+            // Clear validation errors
+            clearFormErrors('formData');
+            
+            // Uncheck all checkboxes
             document.querySelectorAll('input[name="access[]"]').forEach(el => el.checked = false);
-            document.getElementById('formData').reset();
-            document.querySelectorAll('.border-error-500').forEach(el => el.classList.remove('border-error-500'));
-            document.querySelectorAll('.text-error-500:not(label span)').forEach(el => el.remove());
+            
+            // Reset Alpine.js checkbox and select states
+            document.querySelectorAll('#formData [x-data]').forEach(el => {
+                if (el.__x) {
+                    if (el.__x.$data.hasOwnProperty('checked')) {
+                        el.__x.$data.checked = false;
+                    }
+                    if (el.__x.$data.hasOwnProperty('isOptionSelected')) {
+                        el.__x.$data.isOptionSelected = false;
+                    }
+                } else if (el._x_dataStack) {
+                    if (el._x_dataStack[0].hasOwnProperty('checked')) {
+                        el._x_dataStack[0].checked = false;
+                    }
+                    if (el._x_dataStack[0].hasOwnProperty('isOptionSelected')) {
+                        el._x_dataStack[0].isOptionSelected = false;
+                    }
+                }
+            });
         }
     </script>
 @endpush

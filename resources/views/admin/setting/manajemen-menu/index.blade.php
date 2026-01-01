@@ -158,9 +158,17 @@
                         document.getElementById('icon').value = response.data.icon || '';
                         document.getElementById('route').value = response.data.route || '';
                         document.getElementById('url').value = response.data.url || '';
-                        document.getElementById('parent_id').value = response.data.parent_id || '';
                         document.getElementById('order').value = response.data.order || '';
-                        document.getElementById('is_active').value = response.data.is_active ? 'true' : 'false';
+                        
+                        // Set select values and sync Alpine state
+                        const parentSelect = document.getElementById('parent_id');
+                        parentSelect.value = response.data.parent_id || '';
+                        syncAlpineSelect(parentSelect, !!response.data.parent_id);
+                        
+                        const activeSelect = document.getElementById('is_active');
+                        activeSelect.value = response.data.is_active ? 'true' : 'false';
+                        syncAlpineSelect(activeSelect, true);
+                        
                         window.dispatchEvent(new CustomEvent('open-modal-menumodal'));
                     }
                 });

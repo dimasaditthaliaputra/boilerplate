@@ -60,6 +60,38 @@
 
 @push('scripts')
     <script type="module">
+        // Reset form completely
+        function resetRoleForm() {
+            const form = document.getElementById('roleForm');
+            if (!form) return;
+            
+            // Reset form values
+            form.reset();
+            document.getElementById('primary_id').value = '';
+            document.getElementById('roleModalLabel').textContent = 'Tambah Role';
+            
+            // Clear validation errors
+            clearFormErrors('roleForm');
+            
+            // Reset Alpine.js checkbox states
+            document.querySelectorAll('#roleForm [x-data]').forEach(el => {
+                if (el.__x) {
+                    el.__x.$data.checked = false;
+                } else if (el._x_dataStack) {
+                    el._x_dataStack[0].checked = false;
+                }
+            });
+            
+            // Uncheck all checkboxes
+            form.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        // Listen for modal close event
+        window.addEventListener('modal-closed-rolemodal', resetRoleForm);
+
+        // Form submission
         document.getElementById('roleForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -110,13 +142,7 @@
                     Object.keys(error.errors).forEach(key => {
                         const input = document.getElementById(key);
                         if (input) {
-                            input.classList.add('border-error-500');
-                            const existingError = input.parentElement.querySelector('.text-error-500:not(label span)');
-                            if (existingError) existingError.remove();
-                            const errorSpan = document.createElement('span');
-                            errorSpan.className = 'text-error-500 text-sm mt-1';
-                            errorSpan.textContent = error.errors[key][0];
-                            input.parentElement.appendChild(errorSpan);
+                            setInputError(input, error.errors[key][0]);
                         }
                     });
                 } else {

@@ -155,10 +155,18 @@
                         document.getElementById('primary_id').value = response.data.id;
                         document.getElementById('name').value = response.data.name;
 
+                        // Reset all checkboxes first
+                        document.querySelectorAll('input[name="permission_name[]"]').forEach(cb => {
+                            syncAlpineCheckbox(cb, false);
+                        });
+
+                        // Set checked state for permissions from response
                         if (response.data.permissions) {
                             response.data.permissions.forEach(function(perm) {
                                 const checkbox = document.querySelector(`input[name="permission_name[]"][value="${perm.name}"]`);
-                                if (checkbox) checkbox.checked = true;
+                                if (checkbox) {
+                                    syncAlpineCheckbox(checkbox, true);
+                                }
                             });
                         }
                         window.dispatchEvent(new CustomEvent('open-modal-rolemodal'));

@@ -14,10 +14,16 @@ $maxWidthClasses = [
 @endphp
 
 <div
-    x-data="{ open: false }"
+    x-data="{ 
+        open: false,
+        closeModal() {
+            this.open = false;
+            $dispatch('modal-closed-{{ $id }}');
+        }
+    }"
     x-on:open-modal-{{ $id }}.window="open = true"
-    x-on:close-modal-{{ $id }}.window="open = false"
-    x-on:keydown.escape.window="open = false"
+    x-on:close-modal-{{ $id }}.window="closeModal()"
+    x-on:keydown.escape.window="if (open) closeModal()"
     x-show="open"
     x-cloak
     class="fixed inset-0 z-99999 overflow-hidden"
@@ -35,7 +41,7 @@ $maxWidthClasses = [
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm"
-        @click="open = false"
+        @click="closeModal()"
     ></div>
 
     {{-- Modal Panel --}}
