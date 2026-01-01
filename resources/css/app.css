@@ -354,7 +354,7 @@ layer(base);
 .dt-container .dt-scroll,
 .dt-container .table-responsive,
 .dt-container .dt-table-wrapper {
-    @apply border-t border-b border-gray-100 dark:border-gray-800;
+    @apply border-t border-gray-200 dark:border-gray-800;
 }
 
 /* Force table to be full width */
@@ -365,72 +365,59 @@ layer(base);
 
 /* Table header */
 .dt-container table.dataTable thead {
-    @apply border-b border-gray-100 dark:border-gray-800;
+    @apply border-y border-gray-200 dark:border-gray-800;
 }
 
 .dt-container table.dataTable thead th {
-    @apply px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50
-    dark:bg-gray-900 dark:text-gray-400;
+    @apply px-4 py-3 text-left text-theme-xs font-medium text-gray-700 bg-transparent
+    dark:text-gray-400 border-r border-gray-200 dark:border-gray-800;
+}
+
+/* Last header cell - no right border */
+.dt-container table.dataTable thead th:last-child {
+    @apply border-r-0;
 }
 
 /* Sorting indicators */
 .dt-container table.dataTable thead th.dt-orderable-asc,
 .dt-container table.dataTable thead th.dt-orderable-desc,
 .dt-container table.dataTable thead th.sorting {
-    @apply cursor-pointer select-none relative pr-8;
+    @apply cursor-pointer select-none relative;
 }
 
-.dt-container table.dataTable thead th.dt-orderable-asc::after,
-.dt-container table.dataTable thead th.dt-orderable-desc::after,
-.dt-container table.dataTable thead th.sorting::after {
-    content: "";
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 12px;
-    opacity: 0.3;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12'%3e%3cpath fill='%236B7280' d='M4 0L8 5H0L4 0ZM4 12L0 7H8L4 12Z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-size: contain;
+/* Sort icon container */
+.dt-container table.dataTable thead th.dt-orderable-asc .dt-column-order,
+.dt-container table.dataTable thead th.dt-orderable-desc .dt-column-order,
+.dt-container table.dataTable thead th .dt-column-order {
+    @apply inline-flex flex-col gap-0.5 ml-2;
 }
 
 .dt-container table.dataTable thead th.dt-orderable-asc:hover,
 .dt-container table.dataTable thead th.dt-orderable-desc:hover,
 .dt-container table.dataTable thead th.sorting:hover {
-    @apply bg-gray-100 dark:bg-gray-800;
-}
-
-.dt-container table.dataTable thead th.dt-ordering-asc::after {
-    opacity: 1;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3e%3cpath fill='%23465FFF' d='M4 0L8 5H0L4 0Z'/%3e%3c/svg%3e");
-}
-
-.dt-container table.dataTable thead th.dt-ordering-desc::after {
-    opacity: 1;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3e%3cpath fill='%23465FFF' d='M4 5L0 0H8L4 5Z'/%3e%3c/svg%3e");
+    @apply bg-gray-50 dark:bg-white/[0.03];
 }
 
 /* ========================================
-   Table Body
+   Table Body - TailAdmin Grid Style
    ======================================== */
 .dt-container table.dataTable tbody td {
-    @apply px-6 py-4 text-sm text-gray-700 border-b border-gray-100 
-    dark:text-gray-300 dark:border-gray-800;
+    @apply px-4 py-3 text-theme-sm text-gray-700 border-t border-r border-gray-100 
+    dark:text-gray-400 dark:border-gray-800;
     vertical-align: middle;
+}
+
+/* Last column - no right border */
+.dt-container table.dataTable tbody td:last-child {
+    @apply border-r-0;
 }
 
 .dt-container table.dataTable tbody tr {
     @apply transition-colors duration-150;
 }
 
-.dt-container table.dataTable tbody tr:last-child td {
-    @apply border-b-0;
-}
-
 .dt-container table.dataTable tbody tr:hover {
-    @apply bg-gray-50 dark:bg-white/[0.03];
+    @apply bg-gray-50 dark:bg-gray-900;
 }
 
 /* ========================================
