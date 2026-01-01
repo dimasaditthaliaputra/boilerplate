@@ -46,43 +46,11 @@
 
 @push('scripts')
     <script type="module">
-        // Expose modal functions to window for onclick handlers
-        window.openRoleModal = function(id = null, url = null) {
-            if (id && url) {
-                $.get(url, function(response) {
-                    if (response.success) {
-                        $('#roleModalLabel').text('Edit Role');
-                        $('#primary_id').val(response.data.id);
-                        $('#name').val(response.data.name);
-                        if (response.data.permissions) {
-                            response.data.permissions.forEach(function(perm) {
-                                $(`input[name="permission_name[]"][value="${perm.name}"]`).prop('checked', true);
-                            });
-                        }
-                        window.dispatchEvent(new CustomEvent('open-modal-rolemodal'));
-                    }
-                });
-            } else {
-                $('#roleModalLabel').text('Tambah Role');
-                resetRoleForm();
-                window.dispatchEvent(new CustomEvent('open-modal-rolemodal'));
-            }
-        };
+        let dataTable;
 
-        window.closeRoleModal = function() {
-            window.dispatchEvent(new CustomEvent('close-modal-rolemodal'));
-            resetRoleForm();
-        };
-
-        function resetRoleForm() {
-            $('#primary_id').val('');
-            $('input[name="permission_name[]"]').prop('checked', false);
-            $('#roleForm')[0].reset();
-        }
-
-        // DataTable initialization
-        $(function() {
-            var table = $('#table').DataTable({
+        // Initialize DataTable on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            dataTable = new DataTable('#table', {
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -119,44 +87,104 @@
                 }
             });
 
-            $(document).on('click', '.edit-button', function() {
-                var id = $(this).data('id');
-                var url = $(this).data('url');
-                window.openRoleModal(id, url);
-            });
+            // Event delegation for edit and delete buttons
+            document.addEventListener('click', function(e) {
+                // Edit button handler
+                if (e.target.closest('.edit-button')) {
+                    const btn = e.target.closest('.edit-button');
+                    const id = btn.dataset.id;
+                    const url = btn.dataset.url;
+                    window.openRoleModal(id, url);
+                }
 
-            $(document).on('click', '.delete-button', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This role will be permanently deleted!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, Delete',
-                    cancelButtonText: 'Cancel',
-                    customClass: {
-                        confirmButton: 'bg-error-500 text-white px-4 py-2 rounded-lg mx-2 hover:bg-error-600',
-                        cancelButton: 'bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300'
-                    },
-                    buttonsStyling: false,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: form.attr('action'),
-                            method: 'POST',
-                            data: form.serialize(),
-                            success: function(response) {
+                // Delete button handler
+                if (e.target.closest('.delete-button')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.delete-button');
+                    const form = btn.closest('form');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'This role will be permanently deleted!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Delete',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            confirmButton: 'bg-error-500 text-white px-4 py-2 rounded-lg mx-2 hover:bg-error-600',
+                            cancelButton: 'bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300'
+                        },
+                        buttonsStyling: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: new FormData(form),
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(response => {
                                 showNotification('success', response.message);
-                                table.ajax.reload(null, false);
-                            },
-                            error: function() {
+                                dataTable.ajax.reload(null, false);
+                            })
+                            .catch(() => {
                                 showNotification('error', 'Failed to delete');
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
             });
         });
+
+        // Modal functions
+        window.openRoleModal = function(id = null, url = null) {
+            if (id && url) {
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success) {
+                        document.getElementById('roleModalLabel').textContent = 'Edit Role';
+                        document.getElementById('primary_id').value = response.data.id;
+                        document.getElementById('name').value = response.data.name;
+
+                        if (response.data.permissions) {
+                            response.data.permissions.forEach(function(perm) {
+                                const checkbox = document.querySelector(`input[name="permission_name[]"][value="${perm.name}"]`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                        window.dispatchEvent(new CustomEvent('open-modal-rolemodal'));
+                    }
+                });
+            } else {
+                document.getElementById('roleModalLabel').textContent = 'Tambah Role';
+                resetRoleForm();
+                window.dispatchEvent(new CustomEvent('open-modal-rolemodal'));
+            }
+        };
+
+        window.closeRoleModal = function() {
+            window.dispatchEvent(new CustomEvent('close-modal-rolemodal'));
+            resetRoleForm();
+        };
+
+        function resetRoleForm() {
+            document.getElementById('primary_id').value = '';
+            document.querySelectorAll('input[name="permission_name[]"]').forEach(el => el.checked = false);
+            document.getElementById('roleForm').reset();
+        }
+
+        // Expose dataTable reload for modal
+        window.reloadRoleTable = function() {
+            dataTable.ajax.reload();
+        };
     </script>
 @endpush

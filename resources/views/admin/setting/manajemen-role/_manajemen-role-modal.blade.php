@@ -50,46 +50,67 @@
 
 @push('scripts')
     <script type="module">
-        $('#roleForm').on('submit', function(e) {
+        document.getElementById('roleForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            let submitBtn = $('#submitRoleBtn');
-            submitBtn.prop('disabled', true).html('<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>Saving...');
+            const submitBtn = document.getElementById('submitRoleBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>Saving...';
 
-            let id = $('#primary_id').val();
-            let url = id ? '{{ route("manajemen-role.update", ["manajemen_role" => ":id"]) }}'.replace(':id', id) :
-                '{{ route("manajemen-role.store") }}';
-            let method = id ? 'PUT' : 'POST';
+            const id = document.getElementById('primary_id').value;
+            const baseStoreUrl = '{{ route("manajemen-role.store") }}';
+            const baseUpdateUrl = '{{ route("manajemen-role.update", ["manajemen_role" => ":id"]) }}';
+            const url = id ? baseUpdateUrl.replace(':id', id) : baseStoreUrl;
 
-            let formData = new FormData(this);
-            formData.append('_method', method);
+            const formData = new FormData(this);
+            if (id) {
+                formData.append('_method', 'PUT');
+            }
 
-            $.ajax({
-                url: url,
+            fetch(url, {
                 method: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    closeRoleModal();
-                    showNotification('success', response.message);
-                    $('#table').DataTable().ajax.reload();
-                    submitBtn.prop('disabled', false).html('Simpan Role');
-                },
-                error: function(response) {
-                    submitBtn.prop('disabled', false).html('Simpan Role');
-                    if (response.status === 422) {
-                        showNotification('error', 'There are errors in your input!');
-                        let errors = response.responseJSON.errors;
-                        $.each(errors, function(key, val) {
-                            let input = $('#' + key);
-                            input.addClass('border-error-500');
-                            input.parent().find('.text-error-500').remove();
-                            input.parent().append('<span class="text-error-500 text-sm mt-1">' + val[0] + '</span>');
-                        });
-                    } else {
-                        showNotification('error', 'An error occurred');
-                    }
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (res.status === 422) {
+                    return res.json().then(data => Promise.reject({ status: 422, errors: data.errors }));
+                }
+                if (!res.ok) {
+                    return Promise.reject({ status: res.status });
+                }
+                return res.json();
+            })
+            .then(response => {
+                closeRoleModal();
+                showNotification('success', response.message);
+                window.reloadRoleTable();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Role';
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Role';
+
+                if (error.status === 422) {
+                    showNotification('error', 'There are errors in your input!');
+                    Object.keys(error.errors).forEach(key => {
+                        const input = document.getElementById(key);
+                        if (input) {
+                            input.classList.add('border-error-500');
+                            const existingError = input.parentElement.querySelector('.text-error-500:not(label span)');
+                            if (existingError) existingError.remove();
+                            const errorSpan = document.createElement('span');
+                            errorSpan.className = 'text-error-500 text-sm mt-1';
+                            errorSpan.textContent = error.errors[key][0];
+                            input.parentElement.appendChild(errorSpan);
+                        }
+                    });
+                } else {
+                    showNotification('error', 'An error occurred');
                 }
             });
         });

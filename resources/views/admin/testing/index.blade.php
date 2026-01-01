@@ -36,9 +36,9 @@
 @endsection
 
 @push('scripts')
-    <script>
-        $(function() {
-            var table = $('#table').DataTable({
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', function() {
+            new DataTable('#table', {
                 processing: true,
                 serverSide: true,
                 responsive: true,

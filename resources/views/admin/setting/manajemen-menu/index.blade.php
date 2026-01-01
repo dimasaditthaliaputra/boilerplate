@@ -49,43 +49,10 @@
 
 @push('scripts')
     <script type="module">
-        // Expose modal functions to window for onclick handlers
-        window.openMenuModal = function(id = null, url = null) {
-            if (id && url) {
-                $.get(url, function(response) {
-                    if (response.success) {
-                        $('#menuModalLabel').text('Edit Menu');
-                        $('#primary_id').val(response.data.id);
-                        $('#name').val(response.data.name);
-                        $('#icon').val(response.data.icon);
-                        $('#route').val(response.data.route);
-                        $('#url').val(response.data.url);
-                        $('#parent_id').val(response.data.parent_id).trigger('change');
-                        $('#order').val(response.data.order);
-                        $('#is_active').val(response.data.is_active ? 'true' : 'false');
-                        window.dispatchEvent(new CustomEvent('open-modal-menumodal'));
-                    }
-                });
-            } else {
-                $('#menuModalLabel').text('Tambah Menu');
-                resetMenuForm();
-                window.dispatchEvent(new CustomEvent('open-modal-menumodal'));
-            }
-        };
+        let dataTable;
 
-        window.closeMenuModal = function() {
-            window.dispatchEvent(new CustomEvent('close-modal-menumodal'));
-            resetMenuForm();
-        };
-
-        function resetMenuForm() {
-            $('#primary_id').val('');
-            $('#menuForm')[0].reset();
-        }
-
-        // DataTable initialization
-        $(function() {
-            var table = $('#table').DataTable({
+        document.addEventListener('DOMContentLoaded', function() {
+            dataTable = new DataTable('#table', {
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -126,44 +93,96 @@
                 }
             });
 
-            $(document).on('click', '.edit-button', function() {
-                var id = $(this).data('id');
-                var url = $(this).data('url');
-                window.openMenuModal(id, url);
-            });
+            // Event delegation
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-button')) {
+                    const btn = e.target.closest('.edit-button');
+                    window.openMenuModal(btn.dataset.id, btn.dataset.url);
+                }
 
-            $(document).on('click', '.delete-button', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This menu will be permanently deleted!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, Delete',
-                    cancelButtonText: 'Cancel',
-                    customClass: {
-                        confirmButton: 'bg-error-500 text-white px-4 py-2 rounded-lg mx-2 hover:bg-error-600',
-                        cancelButton: 'bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300'
-                    },
-                    buttonsStyling: false,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: form.attr('action'),
-                            method: 'POST',
-                            data: form.serialize(),
-                            success: function(response) {
+                if (e.target.closest('.delete-button')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.delete-button');
+                    const form = btn.closest('form');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'This menu will be permanently deleted!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Delete',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            confirmButton: 'bg-error-500 text-white px-4 py-2 rounded-lg mx-2 hover:bg-error-600',
+                            cancelButton: 'bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300'
+                        },
+                        buttonsStyling: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: new FormData(form),
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(response => {
                                 showNotification('success', response.message);
-                                table.ajax.reload(null, false);
-                            },
-                            error: function() {
+                                dataTable.ajax.reload(null, false);
+                            })
+                            .catch(() => {
                                 showNotification('error', 'Failed to delete');
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
             });
         });
+
+        window.openMenuModal = function(id = null, url = null) {
+            if (id && url) {
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success) {
+                        document.getElementById('menuModalLabel').textContent = 'Edit Menu';
+                        document.getElementById('primary_id').value = response.data.id;
+                        document.getElementById('name').value = response.data.name;
+                        document.getElementById('icon').value = response.data.icon || '';
+                        document.getElementById('route').value = response.data.route || '';
+                        document.getElementById('url').value = response.data.url || '';
+                        document.getElementById('parent_id').value = response.data.parent_id || '';
+                        document.getElementById('order').value = response.data.order || '';
+                        document.getElementById('is_active').value = response.data.is_active ? 'true' : 'false';
+                        window.dispatchEvent(new CustomEvent('open-modal-menumodal'));
+                    }
+                });
+            } else {
+                document.getElementById('menuModalLabel').textContent = 'Tambah Menu';
+                resetMenuForm();
+                window.dispatchEvent(new CustomEvent('open-modal-menumodal'));
+            }
+        };
+
+        window.closeMenuModal = function() {
+            window.dispatchEvent(new CustomEvent('close-modal-menumodal'));
+            resetMenuForm();
+        };
+
+        function resetMenuForm() {
+            document.getElementById('primary_id').value = '';
+            document.getElementById('menuForm').reset();
+        }
+
+        window.reloadMenuTable = function() {
+            dataTable.ajax.reload();
+        };
     </script>
 @endpush
